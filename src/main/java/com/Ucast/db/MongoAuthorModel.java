@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "Authors")
-public class AuthorModel {
+public class MongoAuthorModel {
 
     @Id
     private String id;
@@ -12,9 +12,9 @@ public class AuthorModel {
     private String name;
     private String email;
 
-    public AuthorModel() {}
+    public MongoAuthorModel() {}
 
-    public AuthorModel(String name, String email){
+    public MongoAuthorModel(String name, String email){
         this.name = name;
         this.email = email;
     }
@@ -24,5 +24,13 @@ public class AuthorModel {
         return String.format(
                 "Author [id=%s, name=%s, email=%s]",
                 id, name, email);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }
