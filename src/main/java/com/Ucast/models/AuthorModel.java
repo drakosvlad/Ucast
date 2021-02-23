@@ -10,6 +10,11 @@ public class AuthorModel {
         this.email = email;
     }
 
+    public AuthorModel(MongoAuthorModel that){
+        this.email = that.getEmail();
+        this.name = that.getName();
+    }
+
     public String getEmail() {
         return email;
     }
