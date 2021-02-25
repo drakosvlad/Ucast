@@ -10,13 +10,16 @@ public class MongoUserModel {
     private String id;
     private String username;
     private String email;
+    private String password;
     private String avatarUrl;   //??
 
     public MongoUserModel(){}
 
-    public MongoUserModel(String username, String email){
+    public MongoUserModel(String username, String email, String password, String avatarUrl){
         this.username = username;
         this.email = email;
+        this.password = password;
+        this.avatarUrl = avatarUrl;
     }
 
     @Override
@@ -43,5 +46,9 @@ public class MongoUserModel {
 
     public String getId() {
         return id;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
