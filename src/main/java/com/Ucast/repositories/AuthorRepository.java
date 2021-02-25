@@ -7,4 +7,5 @@ public interface AuthorRepository extends MongoRepository<MongoAuthorModel, Stri
 
     public MongoAuthorModel findByEmail(String email);
     public MongoAuthorModel findByName(String name);
+
 }

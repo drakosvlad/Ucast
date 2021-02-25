@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.*;
 
 @RestController
@@ -19,9 +20,9 @@ public class AuthorController {
     @Autowired
     private AuthorRepository authorRepository;
 
-    @RequestMapping("/author/{email}")
-    public ResponseEntity<AuthorModel> getAuthor(@PathVariable("email") String email){
-        MongoAuthorModel mongoModel = authorRepository.findByEmail(email);
+    @RequestMapping("/author/{name}")
+    public ResponseEntity<AuthorModel> getAuthorInfo(@PathVariable("name") String name){
+        MongoAuthorModel mongoModel = authorRepository.findByName(name);
         AuthorModel result;
         try{
             result = new AuthorModel(mongoModel);
@@ -36,7 +37,7 @@ public class AuthorController {
     public List<AuthorModel> getAllAuthors(){
         //
         List<MongoAuthorModel> mongoModels = authorRepository.findAll();
-        List<AuthorModel> result = new ArrayList<AuthorModel>();
+        List<AuthorModel> result = new ArrayList<>();
         for(MongoAuthorModel mongoModel: mongoModels){
             result.add(new AuthorModel((mongoModel)));
         }
@@ -45,12 +46,13 @@ public class AuthorController {
 
     @RequestMapping("author-registration")
     public ResponseEntity register(@Validated @RequestBody AuthorModel author){
-        try{
-            authorRepository.save(new MongoAuthorModel(author));
-            return ResponseEntity.ok().build();
-        }catch(Exception e){
+        Optional<MongoAuthorModel> mongoAuthor = Optional.ofNullable(authorRepository.findByEmail(author.getEmail()));
+        if(mongoAuthor.isPresent()){
             return ResponseEntity.status(403).build();  // change status code to correct one
         }
+        authorRepository.save(new MongoAuthorModel(author));
+        return ResponseEntity.created(URI.create(String.format("/author/%s", author.getName()))).build();
+
     }
 
 
