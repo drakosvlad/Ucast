@@ -11,4 +11,35 @@ public class PodcastModel {
     private boolean isChecked;
     private String description;
 
+    public PodcastModel(MongoPodcastModel that){
+        authorId = that.getAuthorId();
+        name = that.getName();
+        authorName = that.getAuthorName();
+        filepath = that.getFilepath();
+        description = that.getDescription();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ObjectId getAuthorId() {
+        return authorId;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public String getFilepath() {
+        return filepath;
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 }
