@@ -7,6 +7,6 @@ services:
       args:
         - JAR_FILE=build/libs/*.jar
     ports: 
-      - "8080:8080"
+      - "8388:8080"
     restart: unless-stopped
 
