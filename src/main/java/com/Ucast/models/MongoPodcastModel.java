@@ -35,6 +35,14 @@ public class MongoPodcastModel {
         this.description = description;
     }
 
+    public MongoPodcastModel(PodcastModel that){
+        authorId = that.getAuthorId();
+        name = that.getName();
+        authorName = that.getAuthorName();
+        filepath = that.getFilepath();
+        description = that.getDescription();
+    }
+
     @Override
     public String toString() {
         return "MongoPodcastModel{" +

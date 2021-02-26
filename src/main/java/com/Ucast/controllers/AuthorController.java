@@ -3,6 +3,7 @@ package com.Ucast.controllers;
 import com.Ucast.repositories.AuthorRepository;
 import com.Ucast.models.MongoAuthorModel;
 import com.Ucast.models.AuthorModel;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -20,7 +21,7 @@ public class AuthorController {
     @Autowired
     private AuthorRepository authorRepository;
 
-    @RequestMapping("/author/{name}")
+    @RequestMapping("/author/name/{name}")
     public ResponseEntity<AuthorModel> getAuthorInfo(@PathVariable("name") String name){
         MongoAuthorModel mongoModel = authorRepository.findByName(name);
         AuthorModel result;
@@ -31,6 +32,18 @@ public class AuthorController {
             return ResponseEntity.notFound().build();
         }
 //        return new AuthorModel(mongoModel.getName(), mongoModel.getEmail());
+    }
+
+    @RequestMapping("/author/id/{id}")
+    public ResponseEntity<AuthorModel> getAuthorInfo(@PathVariable("id") ObjectId id){
+        MongoAuthorModel mongoModel = authorRepository.findById(id);
+        AuthorModel result;
+        try{
+            result = new AuthorModel(mongoModel);
+            return ResponseEntity.ok().body(result);
+        }catch (NullPointerException e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @RequestMapping("/authors")
