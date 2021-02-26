@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        - JAR_FILE=build/libs/*.jar
+    ports: 
+      - "8388:8080"
+    restart: unless-stopped
+
