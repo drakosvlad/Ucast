@@ -2,6 +2,7 @@ package com.Ucast.models;
 
 public class AuthorModel {
 
+    private String id;
     private String name;
     private String email;
 
@@ -13,6 +14,7 @@ public class AuthorModel {
     public AuthorModel(MongoAuthorModel that){
         this.email = that.getEmail();
         this.name = that.getName();
+        this.id = that.getId();
     }
 
     public String getEmail() {

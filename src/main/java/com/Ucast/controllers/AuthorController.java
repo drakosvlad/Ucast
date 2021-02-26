@@ -47,14 +47,14 @@ public class AuthorController {
     }
 
     @RequestMapping("/authors")
-    public List<AuthorModel> getAllAuthors(){
-        //
-        List<MongoAuthorModel> mongoModels = authorRepository.findAll();
-        List<AuthorModel> result = new ArrayList<>();
-        for(MongoAuthorModel mongoModel: mongoModels){
-            result.add(new AuthorModel((mongoModel)));
-        }
-        return result;
+    public List<MongoAuthorModel> getAllAuthors(){
+        return authorRepository.findAll();
+//        List<MongoAuthorModel> mongoModels = authorRepository.findAll();
+//        List<AuthorModel> result = new ArrayList<>();
+//        for(MongoAuthorModel mongoModel: mongoModels){
+//            result.add(new AuthorModel((mongoModel)));
+//        }
+//        return result;
     }
 
     @RequestMapping("author-registration")

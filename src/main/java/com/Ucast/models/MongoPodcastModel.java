@@ -79,4 +79,7 @@ public class MongoPodcastModel {
     public String getFilepath() {
         return filepath;
     }
+
+    public String getId()  {return id;}
+
 }

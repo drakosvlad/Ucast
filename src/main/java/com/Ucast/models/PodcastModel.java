@@ -4,6 +4,7 @@ import org.bson.types.ObjectId;
 
 public class PodcastModel {
 
+    private String id;
     private String name;
     private ObjectId authorId;
     private String authorName;
@@ -12,6 +13,7 @@ public class PodcastModel {
     private String description;
 
     public PodcastModel(MongoPodcastModel that){
+        id = that.getId();
         authorId = that.getAuthorId();
         name = that.getName();
         authorName = that.getAuthorName();
