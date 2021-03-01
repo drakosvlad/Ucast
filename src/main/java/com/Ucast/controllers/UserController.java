@@ -23,7 +23,7 @@ public class UserController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    @RequestMapping("/user-registration")
+    @RequestMapping("/registration")
     public ResponseEntity userRegister(@Valid @RequestBody UserRegistrationModel registrationModel){
         try{
             MongoUserModel existingModel = userRepository.findByEmail(registrationModel.getEmail());
@@ -52,9 +52,9 @@ public class UserController {
             }else{
                 String encryptedPassword = passwordEncoder.encode(loginModel.getPassword());
                 if(encryptedPassword.equals(mongoModel.getPassword())){
-                   return null; // TODO complete response with auth token
+                   return null; // TODO complete response with auth token (or no?)
                 }
-                return ResponseEntity.status(401).build();  // TODO complete response?
+                return ResponseEntity.status(401).build();  // TODO complete response with exception text?
             }
         }catch (Exception e){
             return ResponseEntity.unprocessableEntity().build();

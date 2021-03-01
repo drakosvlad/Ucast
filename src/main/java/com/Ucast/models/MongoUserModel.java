@@ -1,5 +1,6 @@
 package com.Ucast.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -10,8 +11,11 @@ public class MongoUserModel {
     private String id;
     private String username;
     private String email;
-    private String password;
     private String avatarUrl;   //??
+
+//    @JsonIgnore
+    private String password;
+
 
     public MongoUserModel(){}
 
