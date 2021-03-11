@@ -59,15 +59,12 @@ public class AuthorController {
 
     @RequestMapping("author-registration")
     public ResponseEntity register(@Validated @RequestBody AuthorModel author){
-        Optional<MongoAuthorModel> mongoAuthor = Optional.ofNullable(authorRepository.findByEmail(author.getEmail()));
-        if(mongoAuthor.isPresent()){
-            return ResponseEntity.status(403).build();  // change status code to correct one
-        }
-        authorRepository.save(new MongoAuthorModel(author));
-        return ResponseEntity.created(URI.create(String.format("/author/%s", author.getName()))).build();
-
+//        Optional<MongoAuthorModel> mongoAuthor = Optional.ofNullable(authorRepository.findByEmail(author.getEmail()));
+//        if(mongoAuthor.isPresent()){
+//            return ResponseEntity.status(403).build();  // change status code to correct one
+//        }
+//        authorRepository.save(new MongoAuthorModel(author));
+//        return ResponseEntity.created(URI.create(String.format("/author/%s", author.getName()))).build();
+        return ResponseEntity.status(403).build();
     }
-
-
-
 }

@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Component
 public class JwtTokenProvider implements Serializable {
 
     @Value("${jwt.token.validity}")
@@ -27,7 +29,7 @@ public class JwtTokenProvider implements Serializable {
     public String AUTHORITIES_KEY;
 
     public String getUserIdFromToken(String token){
-        return getClaimFromToken(token, Claims::getId);  // changing to getSubject may be needed
+        return getClaimFromToken(token, Claims::getAudience);  // changing to getSubject may be needed
     }
 
     public Date getExpirationDateFromToken(String token){
@@ -51,13 +53,9 @@ public class JwtTokenProvider implements Serializable {
         return expiration.before(new Date());
     }
 
-    public String generateToken(Authentication authentication){
-        String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
+    public String generateToken(String id){
         return Jwts.builder()
-                .setId(authentication.getName())
-                .claim(AUTHORITIES_KEY, authorities)
+                .setAudience(id)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + TOKEN_VALIDITY*1000))
                 .signWith(SignatureAlgorithm.HS256, SIGNING_KEY)

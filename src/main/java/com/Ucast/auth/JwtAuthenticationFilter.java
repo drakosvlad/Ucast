@@ -6,6 +6,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -40,22 +41,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authToken = header.replace(TOKEN_PREFIX, "");
             try{
                 userId = jwtTokenProvider.getUserIdFromToken(authToken);
-            }catch (ExpiredJwtException e){
+            } catch (ExpiredJwtException e){
                 logger.warn("Token has expired", e);
-            }catch (SignatureException e){
+            } catch (SignatureException e){
                 logger.error("Authentication failed");
-            }catch (Exception e){
+            } catch (Exception e){
                 logger.error("Error", e);
             }
-        }else{
+        } else {
             logger.warn("Cannot find bearer string");
         }
+
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null){
             Optional<MongoUserModel> user = userRepository.findById(userId);
 
-            if(user.isPresent() && jwtTokenProvider.validateToken(authToken, user.get())){
-                // TODO complete method
+            if (user.isPresent() && jwtTokenProvider.validateToken(authToken, user.get())) {
+                var userDetails = CustomUserDetails.fromUserEntityToCustomUserDetails(user.get());
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
+
+        filterChain.doFilter(request, response);
     }
 }

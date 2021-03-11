@@ -31,9 +31,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new JwtAuthenticationFilter();
     }
 
-
-
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors()
@@ -44,8 +41,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         .antMatchers("/login", "/registration").permitAll()
                             .anyRequest().authenticated()
                 .and()
-                    .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class); // is that all?
-
+                    .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class).cors(); // is that all?
     }
-
 }
