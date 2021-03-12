@@ -15,4 +15,4 @@ jobs:
         username: ${{ secrets.GEMINI_USERNAME }}
         key: ${{ secrets.GEMINI_SSH }}
         port: ${{ secrets.GEMINI_PORT }}
-        script: cd /Share/Projects/Ucast && gradle bootJar && docker-compose down && docker-compose build && docker-compose up -d
+        script: sdk use java 11.0.10.9.1-amzn && cd /Share/Projects/Ucast && git pull && gradle bootJar && docker-compose down && docker-compose build && docker-compose up -d
