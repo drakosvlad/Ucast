@@ -10,9 +10,12 @@ jobs:
     steps:
     - name: connecting & deploying
       uses: appleboy/ssh-action@master
+      env:
+        JAVA_HOME: /home/server/.sdkman/candidates/java/11.0.10.9.1-amzn
       with:
         host: ${{ secrets.GEMINI_HOST }}
         username: ${{ secrets.GEMINI_USERNAME }}
         key: ${{ secrets.GEMINI_SSH }}
         port: ${{ secrets.GEMINI_PORT }}
-        script: JAVA_HOME=/home/server/.sdkman/candidates/java/11.0.10.9.1-amzn && where java && cd /Share/Projects/Ucast && git pull && gradle bootJar && docker-compose down && docker-compose build && docker-compose up -d
+        envs: JAVA_HOME,
+        script:  cd /Share/Projects/Ucast && git pull && gradle bootJar && docker-compose down && docker-compose build && docker-compose up -d
