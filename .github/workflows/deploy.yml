@@ -1,0 +1,18 @@
+name: deploy
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: connecting & deploying
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.GEMINI_HOST }}
+        username: ${{ secrets.GEMINI_USERNAME }}
+        key: ${{ secrets.GEMINI_SSH }}
+        port: ${{ secrets.GEMINI_PORT }}
+        script: cd /Share/Projects/Ucast && gradle bootJar && docker-compose down && docker-compose build && docker-compose up -d
