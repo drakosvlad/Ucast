@@ -57,8 +57,12 @@ public class UserController {
                 String encryptedPassword = passwordEncoder.encode(loginModel.getPassword());
 
                 if (passwordEncoder.matches(loginModel.getPassword(), mongoModel.getPassword())) {
-                    var token = jwtTokenProvider.generateToken(mongoModel.getId());
-                    return ResponseEntity.ok(token);
+                    var authToken = jwtTokenProvider.generateToken(mongoModel.getId());
+                    return ResponseEntity.ok(new Object() {
+                                public final String token = authToken;
+                                public final String role = "ROLE_USER";
+                            }
+                    );
                 }
                 return ResponseEntity.status(401).build();  // TODO complete response with exception text?
             }

@@ -6,6 +6,9 @@ import com.Ucast.models.AuthorModel;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.*;
 
 @RestController
@@ -47,8 +51,13 @@ public class AuthorController {
     }
 
     @RequestMapping("/authors")
-    public List<MongoAuthorModel> getAllAuthors(){
-        return authorRepository.findAll();
+    public ResponseEntity<List<MongoAuthorModel>> getAllAuthors(Authentication authentication) {
+        // ROLE VERIFICATION EXAMPLE
+//        if (!authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER"))) {
+//            return ResponseEntity.status(403).build();
+//        }
+
+        return ResponseEntity.ok().body(authorRepository.findAll());
 //        List<MongoAuthorModel> mongoModels = authorRepository.findAll();
 //        List<AuthorModel> result = new ArrayList<>();
 //        for(MongoAuthorModel mongoModel: mongoModels){

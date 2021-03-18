@@ -38,7 +38,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                     .authorizeRequests()
-                        .antMatchers("/login", "/registration").permitAll()
+                        .antMatchers(
+                                "/login",
+                                "/registration",
+                                "/authors",
+                                "/author/**",
+                                "/podcasts",
+                                "/podcast/**"
+                        ).permitAll()
                             .anyRequest().authenticated()
                 .and()
                     .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class).cors(); // is that all?
