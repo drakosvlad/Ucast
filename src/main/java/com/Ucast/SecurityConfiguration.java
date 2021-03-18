@@ -44,7 +44,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                                 "/authors",
                                 "/author/**",
                                 "/podcasts",
-                                "/podcast/**"
+                                "/podcast/**",
+                                "/static/**"
                         ).permitAll()
                             .anyRequest().authenticated()
                 .and()

@@ -17,5 +17,5 @@ jobs:
         username: ${{ secrets.GEMINI_USERNAME }}
         key: ${{ secrets.GEMINI_SSH }}
         port: ${{ secrets.GEMINI_PORT }}
-        envs: JAVA_HOME,
+        envs: JAVA_HOME
         script:  cd /Share/Projects/Ucast && git pull && gradle assemble && gradle bootJar && docker-compose down && docker-compose build && docker-compose up -d

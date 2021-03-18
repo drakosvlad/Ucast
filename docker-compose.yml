@@ -15,6 +15,10 @@ services:
       context: .
       args:
         - JAR_FILE=build/libs/*.jar
+    volumes:
+      -  /Share/static:/static
+    environment:
+      - STORAGE_PATH=/static
     ports: 
       - "8388:8080"
     restart: unless-stopped
