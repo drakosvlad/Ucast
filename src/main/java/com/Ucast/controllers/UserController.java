@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -58,19 +60,19 @@ public class UserController {
             if (check.isEmpty()) {
                 return ResponseEntity.notFound().build();
             } else {
-                String userRole = "ROLE_USER";
+                List<String> userRoles = new ArrayList<>();
+                userRoles.add("ROLE_USER");
 //                String encryptedPassword = passwordEncoder.encode(loginModel.getPassword());
                 MongoAuthorModel authorModel = authorRepository.findByUserId(mongoModel.getObjectId());
                 Optional<MongoAuthorModel> checkAuthor = Optional.ofNullable(authorModel);
                 if(checkAuthor.isPresent()){
-                    userRole = "ROLE_AUTHOR";
+                    userRoles.add("ROLE_AUTHOR");
                 }
                 if (passwordEncoder.matches(loginModel.getPassword(), mongoModel.getPassword())) {
                     var authToken = jwtTokenProvider.generateToken(mongoModel.getId());
-                    String finalUserRole = userRole;
                     return ResponseEntity.ok(new Object() {
                                 public final String token = authToken;
-                                public final String role = finalUserRole;
+                                public final List<String> roles = userRoles;
                             }
                     );
                 }
