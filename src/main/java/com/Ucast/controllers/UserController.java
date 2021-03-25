@@ -1,9 +1,11 @@
 package com.Ucast.controllers;
 
 import com.Ucast.auth.JwtTokenProvider;
+import com.Ucast.models.MongoAuthorModel;
 import com.Ucast.models.MongoUserModel;
 import com.Ucast.models.UserLoginModel;
 import com.Ucast.models.UserRegistrationModel;
+import com.Ucast.repositories.AuthorRepository;
 import com.Ucast.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,6 +23,8 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AuthorRepository authorRepository;
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
@@ -54,13 +58,19 @@ public class UserController {
             if (check.isEmpty()) {
                 return ResponseEntity.notFound().build();
             } else {
-                String encryptedPassword = passwordEncoder.encode(loginModel.getPassword());
-
+                String userRole = "ROLE_USER";
+//                String encryptedPassword = passwordEncoder.encode(loginModel.getPassword());
+                MongoAuthorModel authorModel = authorRepository.findByUserId(mongoModel.getObjectId());
+                Optional<MongoAuthorModel> checkAuthor = Optional.ofNullable(authorModel);
+                if(checkAuthor.isPresent()){
+                    userRole = "ROLE_AUTHOR";
+                }
                 if (passwordEncoder.matches(loginModel.getPassword(), mongoModel.getPassword())) {
                     var authToken = jwtTokenProvider.generateToken(mongoModel.getId());
+                    String finalUserRole = userRole;
                     return ResponseEntity.ok(new Object() {
                                 public final String token = authToken;
-                                public final String role = "ROLE_USER";
+                                public final String role = finalUserRole;
                             }
                     );
                 }
@@ -71,5 +81,6 @@ public class UserController {
             return ResponseEntity.unprocessableEntity().build();
         }
     }
+
 }
 

@@ -1,12 +1,13 @@
 package com.Ucast.repositories;
 
 import com.Ucast.models.MongoUserModel;
-import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
+
+import java.util.Optional;
 
 public interface UserRepository extends MongoRepository<MongoUserModel, String> {
 
     public MongoUserModel findByEmail(String Email);
-    public MongoUserModel findById(ObjectId id);
+    public Optional<MongoUserModel> findById(String id);
 //    public MongoUserModel findById()
 }

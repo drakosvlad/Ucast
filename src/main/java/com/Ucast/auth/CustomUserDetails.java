@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -13,13 +14,22 @@ public class CustomUserDetails implements UserDetails {
 
     private String login;
     private String password;
-    private Collection<? extends GrantedAuthority> grantedAuthorities;
+    private Collection<GrantedAuthority> grantedAuthorities;
 
-    public static CustomUserDetails fromUserEntityToCustomUserDetails(MongoUserModel userEntity) {
+    public static CustomUserDetails fromUserEntityToCustomUserDetails(MongoUserModel userEntity, String role) {
         CustomUserDetails c = new CustomUserDetails();
         c.login = userEntity.getEmail();
         c.password = userEntity.getPassword();
-        c.grantedAuthorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")); // TODO change role
+        switch(role){
+            case "USER":
+                c.grantedAuthorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")); // TODO change role
+                break;
+            case "AUTHOR":
+                c.grantedAuthorities = new ArrayList<>();
+                c.grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                c.grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                break;
+        }
         return c;
     }
 

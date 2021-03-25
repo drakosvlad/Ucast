@@ -1,6 +1,7 @@
 package com.Ucast.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -50,6 +51,10 @@ public class MongoUserModel {
 
     public String getId() {
         return id;
+    }
+
+    public ObjectId getObjectId(){
+        return new ObjectId(this.id);
     }
 
     public String getPassword() {

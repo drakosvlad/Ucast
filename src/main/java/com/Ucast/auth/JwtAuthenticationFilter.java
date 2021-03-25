@@ -1,9 +1,12 @@
 package com.Ucast.auth;
 
+import com.Ucast.models.MongoAuthorModel;
 import com.Ucast.models.MongoUserModel;
+import com.Ucast.repositories.AuthorRepository;
 import com.Ucast.repositories.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +34,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AuthorRepository authorRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
@@ -54,10 +60,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null){
             Optional<MongoUserModel> user = userRepository.findById(userId);
+            Optional<MongoAuthorModel> author = Optional.ofNullable(authorRepository.findByUserId(new ObjectId(userId)));
 
             if (user.isPresent() && jwtTokenProvider.validateToken(authToken, user.get())) {
-                var userDetails = CustomUserDetails.fromUserEntityToCustomUserDetails(user.get());
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                String role = "USER";
+                if(author.isPresent()){
+                    role = "ADMIN";
+                }
+                var userDetails = CustomUserDetails.fromUserEntityToCustomUserDetails(user.get(), role);
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails,
+                        null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }

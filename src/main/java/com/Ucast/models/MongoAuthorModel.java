@@ -4,6 +4,9 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Document(collection = "Authors")
 public class MongoAuthorModel {
@@ -11,9 +14,18 @@ public class MongoAuthorModel {
     @Id
     private String id;
     private String name;
+    private String description;
     private ObjectId userId;
+    private List<ObjectId> podcastIdList;
 
-    public MongoAuthorModel() {}
+//    public MongoAuthorModel() {}
+
+    public MongoAuthorModel(MongoUserModel user){
+        this.name = user.getUsername();
+        this.userId = user.getObjectId();
+        this.description = "";
+        this.podcastIdList = new ArrayList<>();
+    }
 
     public MongoAuthorModel(String name, ObjectId userId){
         this.name = name;
@@ -40,5 +52,13 @@ public class MongoAuthorModel {
 
     public ObjectId getUserId() {
         return userId;
+    }
+
+    public String getDescription(){
+        return this.description;
+    }
+
+    public List<ObjectId> getPodcastIdList() {
+        return podcastIdList;
     }
 }
