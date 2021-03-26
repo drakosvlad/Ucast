@@ -72,7 +72,7 @@ public class AuthorController {
     }
 
     @Secured("ROLE_USER")
-    @RequestMapping("author-registration")
+    @RequestMapping("/author-registration")
     public ResponseEntity register(@Validated @RequestBody AuthorModel author){
         try{
             String login = SecurityContextHolder.getContext().getAuthentication().getName();

@@ -14,6 +14,8 @@ public class AuthorModel {
         this.userId = userId;
     }
 
+    public AuthorModel(){}
+
     public AuthorModel(MongoAuthorModel that){
         this.name = that.getName();
         this.userId = that.getUserId();

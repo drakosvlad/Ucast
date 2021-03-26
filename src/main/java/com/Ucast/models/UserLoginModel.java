@@ -20,6 +20,10 @@ public class UserLoginModel {
         this.password = password;
     }
 
+    public UserLoginModel(){
+
+    }
+
     public String getPassword() {
         return password;
     }
