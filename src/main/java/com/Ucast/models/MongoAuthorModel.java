@@ -18,7 +18,7 @@ public class MongoAuthorModel {
     private ObjectId userId;
     private List<ObjectId> podcastIdList;
 
-//    public MongoAuthorModel() {}
+    public MongoAuthorModel() {}
 
     public MongoAuthorModel(MongoUserModel user){
         this.name = user.getUsername();
