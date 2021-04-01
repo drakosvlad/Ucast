@@ -13,10 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.security.Principal;
@@ -72,7 +69,7 @@ public class AuthorController {
     }
 
     @Secured("ROLE_USER")
-    @RequestMapping("/author-registration")
+    @PostMapping("/author-registration")
     public ResponseEntity register(@Validated @RequestBody AuthorModel author){
         try{
             String login = SecurityContextHolder.getContext().getAuthentication().getName();

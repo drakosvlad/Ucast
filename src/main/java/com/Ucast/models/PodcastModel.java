@@ -6,27 +6,36 @@ public class PodcastModel {
 
     private String id;
     private String name;
-    private ObjectId authorId;
     private String authorName;
     private String filepath;
-    private boolean isChecked;
     private String description;
 
     public PodcastModel(MongoPodcastModel that){
         id = that.getId();
-        authorId = that.getAuthorId();
         name = that.getName();
         authorName = that.getAuthorName();
         filepath = that.getFilepath();
         description = that.getDescription();
     }
 
-    public String getName() {
-        return name;
+    public PodcastModel(){}
+
+    public PodcastModel(String name, String filepath, String description){
+        this.name = name;
+        this.description = description;
+        this.filepath = filepath;
     }
 
-    public ObjectId getAuthorId() {
-        return authorId;
+    public PodcastModel(String id, String name, String filepath, String description){
+        this.id = id;  // id from podcast link
+        this.name = name;
+        this.description = description;
+        this.filepath = filepath;
+    }
+
+
+    public String getName() {
+        return name;
     }
 
     public String getAuthorName() {
@@ -37,11 +46,11 @@ public class PodcastModel {
         return filepath;
     }
 
-    public boolean isChecked() {
-        return isChecked;
-    }
-
     public String getDescription() {
         return description;
+    }
+
+    public String getId() {
+        return id;
     }
 }

@@ -54,11 +54,19 @@ public class MongoAuthorModel {
         return userId;
     }
 
+    public ObjectId getObjectId() {
+        return new ObjectId(this.id);
+    }
+
     public String getDescription(){
         return this.description;
     }
 
     public List<ObjectId> getPodcastIdList() {
         return podcastIdList;
+    }
+
+    public void addPodcast(ObjectId podcastId){
+        this.podcastIdList.add(podcastId);
     }
 }

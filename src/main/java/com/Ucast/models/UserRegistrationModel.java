@@ -22,9 +22,8 @@ public class UserRegistrationModel {
     private String password;
     private String avatarUrl;
 
-    public UserRegistrationModel() {
+    public UserRegistrationModel() {}
 
-    }
 
     public UserRegistrationModel(String username, String email, String password){
         this.username = username;

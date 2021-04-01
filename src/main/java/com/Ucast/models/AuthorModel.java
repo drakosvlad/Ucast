@@ -29,6 +29,8 @@ public class AuthorModel {
     public ObjectId getUserId() {
         return userId;
     }
+
+
 //
 //    public void setEmail(String email) {
 //        this.email = email;
