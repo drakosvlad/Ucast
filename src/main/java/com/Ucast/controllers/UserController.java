@@ -73,6 +73,7 @@ public class UserController {
                     return ResponseEntity.ok(new Object() {
                                 public final String token = authToken;
                                 public final List<String> roles = userRoles;
+                                public final String id = mongoModel.getId();
                             }
                     );
                 }

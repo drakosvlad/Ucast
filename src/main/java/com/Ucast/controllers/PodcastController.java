@@ -75,7 +75,7 @@ public class PodcastController {
     }
 
     @Secured("ROLE_AUTHOR")
-    @PostMapping("/")
+    @PostMapping("/edit-podcast")
     public ResponseEntity editPodcast(@Validated @RequestBody PodcastModel model){
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         MongoUserModel user = userRepository.findByEmail(login);
