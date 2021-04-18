@@ -19,6 +19,9 @@ public class MongoPodcastModel {
     private String filepath;
     private boolean isChecked;
     private String description;
+    private String photoURL;
+    private int listened;
+    private int rating;
     private List reviews;
 
     public MongoPodcastModel(){}
@@ -48,6 +51,7 @@ public class MongoPodcastModel {
         authorName = that.getAuthorName();
         filepath = that.getFilepath();
         description = that.getDescription();
+        photoURL = that.getPhotoURL();
     }
 
     @Override
@@ -111,5 +115,25 @@ public class MongoPodcastModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPhotoURL() {
+        return photoURL;
+    }
+
+    public void setPhotoURL(String photoURL) {
+        this.photoURL = photoURL;
+    }
+
+    public void setListened(int listened) {
+        this.listened = listened;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+
+    public void addListened(){
+        this.listened += 1;
     }
 }

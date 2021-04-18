@@ -5,6 +5,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document(collection = "Users")
 public class MongoUserModel {
 
@@ -13,9 +15,8 @@ public class MongoUserModel {
     private String username;
     private String email;
     private String avatarUrl;   //??
-
-//    @JsonIgnore
     private String password;
+    private List<ObjectId> favoritePodcasts;
 
 
     public MongoUserModel(){}
@@ -59,5 +60,29 @@ public class MongoUserModel {
 
     public String getPassword() {
         return password;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setFavoritePodcasts(List<ObjectId> favoritePodcasts) {
+        this.favoritePodcasts = favoritePodcasts;
+    }
+
+    public void addFavoritePoscast(ObjectId podcastId){
+        this.favoritePodcasts.add(podcastId);
+    }
+
+    public void removeFavoritePodcast(ObjectId podcastId){
+        this.favoritePodcasts.remove(podcastId);
+    }
+
+    public List<ObjectId> getFavoritePodcasts() {
+        return favoritePodcasts;
     }
 }

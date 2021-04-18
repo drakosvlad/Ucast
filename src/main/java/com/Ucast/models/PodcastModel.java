@@ -9,6 +9,7 @@ public class PodcastModel {
     private String authorName;
     private String filepath;
     private String description;
+    private String photoURL;
 
     public PodcastModel(MongoPodcastModel that){
         id = that.getId();
@@ -16,23 +17,25 @@ public class PodcastModel {
         authorName = that.getAuthorName();
         filepath = that.getFilepath();
         description = that.getDescription();
+        photoURL = that.getPhotoURL();
     }
 
     public PodcastModel(){}
 
-    public PodcastModel(String name, String filepath, String description){
+    public PodcastModel(String name, String filepath, String description, String photoURL){
         this.name = name;
         this.description = description;
         this.filepath = filepath;
+        this.photoURL = photoURL;
     }
 
-    public PodcastModel(String id, String name, String filepath, String description){
+    public PodcastModel(String id, String name, String filepath, String description, String photoURL){
         this.id = id;  // id from podcast link
         this.name = name;
         this.description = description;
         this.filepath = filepath;
+        this.photoURL = photoURL;
     }
-
 
     public String getName() {
         return name;
@@ -52,5 +55,9 @@ public class PodcastModel {
 
     public String getId() {
         return id;
+    }
+
+    public String getPhotoURL() {
+        return photoURL;
     }
 }

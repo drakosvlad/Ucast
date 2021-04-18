@@ -29,6 +29,7 @@ public class UserRegistrationModel {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.avatarUrl = ""; // TODO is that correct?
     }
 
     public UserRegistrationModel(String username, String email, String password, String avatarUrl){

@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,16 +38,14 @@ public class PodcastController {
     }
 
     @RequestMapping("/podcast/{id}")
-    public ResponseEntity<PodcastModel> getPodcastInfo(@PathVariable("id") ObjectId id){
+    public ResponseEntity<MongoPodcastModel> getPodcastInfo(@PathVariable("id") ObjectId id){
         MongoPodcastModel mongoModel = podcastRepository.findById(id);
-        PodcastModel result;
-        try{
-            result = new PodcastModel(mongoModel);
-            return ResponseEntity.ok().body(result);
-        }catch (NullPointerException e){
+        Optional<MongoPodcastModel> check = Optional.ofNullable(mongoModel);
+        if(check.isPresent()){
+            return ResponseEntity.ok(mongoModel);
+        }else {
             return ResponseEntity.notFound().build();
         }
-//        return new AuthorModel(mongoModel.getName(), mongoModel.getEmail());
     }
 
     @Secured("ROLE_AUTHOR")
@@ -62,11 +61,15 @@ public class PodcastController {
         MongoAuthorModel author = authorRepository.findByUserId(userId);
         ObjectId authorId = author.getObjectId();
 
+        // add new model to db
         MongoPodcastModel newPodcast = new MongoPodcastModel(model);
         newPodcast.setChecked(false);
         newPodcast.setAuthorId(authorId);
+        newPodcast.setListened(0);
+        newPodcast.setRating(0);
         podcastRepository.save(newPodcast);
 
+        // add podcast to author's list
         MongoPodcastModel savedPodcast = podcastRepository.findByAuthorIdAndName(authorId, model.getName());
         author.addPodcast(savedPodcast.getObjectId());
         authorRepository.save(author);
@@ -80,6 +83,7 @@ public class PodcastController {
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         MongoUserModel user = userRepository.findByEmail(login);
         ObjectId podcastId;
+        // check if input model is correct
         try{
             podcastId = new ObjectId(model.getId());
         }catch (NullPointerException e){
@@ -87,25 +91,70 @@ public class PodcastController {
             return ResponseEntity.unprocessableEntity().build();
         }
 
+        // authorization validation
         MongoAuthorModel author = authorRepository.findByUserId(user.getObjectId());
         Optional<MongoAuthorModel> authorCheck = Optional.ofNullable(author);
         if(authorCheck.isEmpty()){
             return ResponseEntity.status(404).body("Authentication failed. Author not found");
         }
 
+        // finds podcast model in db
         boolean existsInList = author.getPodcastIdList().contains(podcastId);
         MongoPodcastModel podcast = podcastRepository.findById(podcastId);
         Optional<MongoPodcastModel> podcastCheck = Optional.ofNullable(podcast);
         if(podcastCheck.isEmpty() || !existsInList){
             return ResponseEntity.status(404).body("Podcast not found");
         }
-
+        //  change podcast info
         podcast.setDescription(model.getDescription());
 //        podcast.setFilepath(model.getFilepath());    // uncomment when filepath in static will be able to change
         podcast.setName(model.getName());
+        podcast.setPhotoURL(model.getPhotoURL());
         podcastRepository.save(podcast);
         return ResponseEntity.ok("Podcast info changed");
     }
+
+
+    @Secured("ROLE_USER")
+    @PostMapping("/increment-listened/{id}")
+    public ResponseEntity incrementListenedCounter(@PathVariable("id") String id){
+        // in case input value should be
+//        ObjectId podcastId = new ObjectId(id);
+//        try{
+//            podcastId = new ObjectId(id);
+//        }catch (NullPointerException e){
+//            e.printStackTrace();
+//            return ResponseEntity.unprocessableEntity().build();
+//        }
+        Optional<MongoPodcastModel> check = podcastRepository.findById(id);
+        if (check.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        MongoPodcastModel podcastModel = check.get();
+        podcastModel.addListened();
+        podcastRepository.save(podcastModel);
+        return ResponseEntity.ok().build();
+    }
+
+    @Secured("ROLE_AUTHOR")
+    @GetMapping("/get-favorite-podcasts")
+    public ResponseEntity getFavoritrPodcasts(){
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        MongoUserModel user = userRepository.findByEmail(login);
+        List<ObjectId> podcastIds = user.getFavoritePodcasts();
+        ArrayList<MongoPodcastModel> result = new ArrayList<>();
+        for(ObjectId podcastId:podcastIds){
+            MongoPodcastModel podcast = podcastRepository.findById(podcastId);
+            try{
+                result.add(podcast);
+            }catch (NullPointerException ignored){
+            }
+        }
+        return ResponseEntity.ok(result);
+    }
+
+
+
 
 //    public ResponseEntity deletePodcast(){
 //

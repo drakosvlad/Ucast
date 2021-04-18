@@ -1,6 +1,5 @@
 package com.Ucast;
 
-import com.Ucast.models.AuthorModel;
 import com.Ucast.models.MongoAuthorModel;
 import com.Ucast.models.MongoPodcastModel;
 import com.Ucast.repositories.AuthorRepository;
@@ -15,11 +14,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 //public class UcastApplication implements CommandLineRunner {
 public class UcastApplication{
 
-//	@Autowired
-//	private	AuthorRepository authorRepository;
-//
-//	@Autowired
-//	private PodcastRepository podcastRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(UcastApplication.class, args);

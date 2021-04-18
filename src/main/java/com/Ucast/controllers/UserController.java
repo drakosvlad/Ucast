@@ -1,17 +1,19 @@
 package com.Ucast.controllers;
 
 import com.Ucast.auth.JwtTokenProvider;
-import com.Ucast.models.MongoAuthorModel;
-import com.Ucast.models.MongoUserModel;
-import com.Ucast.models.UserLoginModel;
-import com.Ucast.models.UserRegistrationModel;
+import com.Ucast.models.*;
 import com.Ucast.repositories.AuthorRepository;
+import com.Ucast.repositories.PodcastRepository;
 import com.Ucast.repositories.UserRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -31,6 +33,8 @@ public class UserController {
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private PodcastRepository podcastRepository;
 
     @PostMapping(value = "/registration", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity userRegister(@Valid @RequestBody UserRegistrationModel registrationModel) {
@@ -39,13 +43,16 @@ public class UserController {
             Optional<MongoUserModel> check = Optional.ofNullable(existingModel);
             if (check.isPresent()) {
                 return ResponseEntity.status(403).build();
-            } else {
-                String encryptedPassword = passwordEncoder.encode(registrationModel.getPassword());
-                MongoUserModel newUser = new MongoUserModel(registrationModel.getUsername(),
-                        registrationModel.getEmail(), encryptedPassword, registrationModel.getAvatarUrl());
-                userRepository.save(newUser);
-                return ResponseEntity.created(URI.create(String.format("/user/%s", newUser.getUsername()))).build();
             }
+
+            String encryptedPassword = passwordEncoder.encode(registrationModel.getPassword());
+            MongoUserModel newUser = new MongoUserModel(registrationModel.getUsername(),
+                    registrationModel.getEmail(), encryptedPassword, registrationModel.getAvatarUrl());
+
+            newUser.setFavoritePodcasts(new ArrayList<>());
+            userRepository.save(newUser);
+            return ResponseEntity.created(URI.create(String.format("/user/%s", newUser.getUsername()))).build();
+
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.unprocessableEntity().build();
@@ -77,12 +84,67 @@ public class UserController {
                             }
                     );
                 }
-                return ResponseEntity.status(401).build();  // TODO complete response with exception text?
+                return ResponseEntity.status(401).build();
             }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.unprocessableEntity().build();
         }
+    }
+
+    @Secured("ROLE_USER")
+    @PostMapping("edit-user")
+    public ResponseEntity editUser(@Validated @RequestBody UserRegistrationModel editModel){
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        MongoUserModel userModel = userRepository.findByEmail(login);
+        Optional<MongoUserModel> check = Optional.ofNullable(userModel);
+        if(check.isEmpty()){
+            return ResponseEntity.status(404).body("Authentication failed. User not found");
+        }
+        userModel.setAvatarUrl(editModel.getAvatarUrl());
+        userModel.setUsername(editModel.getUsername());
+        userRepository.save(userModel);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @Secured("ROLE_USER")
+    @PostMapping("add-favorite-podcast")
+    public ResponseEntity addFavoritePodcast(String podcastId){
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        MongoUserModel user = userRepository.findByEmail(login);
+        Optional<MongoUserModel> check = Optional.ofNullable(user);
+        if(check.isEmpty()){
+            return ResponseEntity.status(404).body("Authentication failed. User not found");
+        }
+
+        Optional<MongoPodcastModel> podcastCheck = podcastRepository.findById(podcastId);
+        if(podcastCheck.isEmpty()){
+            return ResponseEntity.status(404).body("Podcast not found");
+        }
+        user.addFavoritePoscast(new ObjectId(podcastId));
+        userRepository.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @Secured("ROLE_USER")
+    @PostMapping("remove-favorite-podcast")
+    public ResponseEntity removeFavoritePodcast(String podcastId){
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        MongoUserModel user = userRepository.findByEmail(login);
+        // TODO check if this validation is necessary
+//        Optional<MongoUserModel> check = Optional.ofNullable(user);
+//        if(check.isEmpty()){
+//            return ResponseEntity.status(404).body("Authentication failed. User not found");
+//        }
+
+        Optional<MongoPodcastModel> podcastCheck = podcastRepository.findById(podcastId);
+        if(podcastCheck.isEmpty()){
+            return ResponseEntity.status(404).body("Podcast not found");
+        }
+        user.removeFavoritePodcast(new ObjectId(podcastId));
+        userRepository.save(user);
+        return ResponseEntity.ok().build();
     }
 
 

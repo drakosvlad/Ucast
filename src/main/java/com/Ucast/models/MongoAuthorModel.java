@@ -17,6 +17,7 @@ public class MongoAuthorModel {
     private String description;
     private ObjectId userId;
     private List<ObjectId> podcastIdList;
+    private String coverURL;
 
     public MongoAuthorModel() {}
 

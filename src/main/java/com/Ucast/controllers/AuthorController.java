@@ -3,7 +3,6 @@ package com.Ucast.controllers;
 import com.Ucast.models.MongoUserModel;
 import com.Ucast.repositories.AuthorRepository;
 import com.Ucast.models.MongoAuthorModel;
-import com.Ucast.models.AuthorModel;
 import com.Ucast.repositories.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,28 +27,24 @@ public class AuthorController {
     private UserRepository userRepository;
 
     @RequestMapping("/author/name/{name}")
-    public ResponseEntity<AuthorModel> getAuthorInfo(@PathVariable("name") String name){
-        MongoAuthorModel mongoModel = authorRepository.findByName(name);
-        AuthorModel result;
-        try{
-            result = new AuthorModel(mongoModel);
-            return ResponseEntity.ok().body(result);
-        }catch (NullPointerException e){
+    public ResponseEntity<MongoAuthorModel> getAuthorInfo(@PathVariable("name") String name){
+        MongoAuthorModel authorModel = authorRepository.findByName(name);
+        Optional<MongoAuthorModel> check = Optional.ofNullable(authorModel);
+        if(check.isEmpty()){
             return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok(authorModel);
 //        return new AuthorModel(mongoModel.getName(), mongoModel.getEmail());
     }
 
     @RequestMapping("/author/id/{id}")
-    public ResponseEntity<AuthorModel> getAuthorInfo(@PathVariable("id") ObjectId id){
-        MongoAuthorModel mongoModel = authorRepository.findById(id);
-        AuthorModel result;
-        try{
-            result = new AuthorModel(mongoModel);
-            return ResponseEntity.ok().body(result);
-        }catch (NullPointerException e){
+    public ResponseEntity<MongoAuthorModel> getAuthorInfo(@PathVariable("id") ObjectId id){
+        MongoAuthorModel authorModel = authorRepository.findById(id);
+        Optional<MongoAuthorModel> check = Optional.ofNullable(authorModel);
+        if(check.isEmpty()){
             return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok(authorModel);
     }
 
     @RequestMapping("/authors")
@@ -70,7 +65,7 @@ public class AuthorController {
 
     @Secured("ROLE_USER")
     @PostMapping("/author-registration")
-    public ResponseEntity register(@Validated @RequestBody AuthorModel author){
+    public ResponseEntity register(){
         try{
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
             MongoUserModel userModel = userRepository.findByEmail(login);
