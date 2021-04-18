@@ -1,11 +1,9 @@
 package com.Ucast.controllers;
 
-import com.Ucast.models.MongoAuthorModel;
-import com.Ucast.models.MongoPodcastModel;
-import com.Ucast.models.MongoUserModel;
-import com.Ucast.models.PodcastModel;
+import com.Ucast.models.*;
 import com.Ucast.repositories.AuthorRepository;
 import com.Ucast.repositories.PodcastRepository;
+import com.Ucast.repositories.ReviewRepository;
 import com.Ucast.repositories.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +29,9 @@ public class PodcastController {
 
     @Autowired
     private UserRepository userRepository;
+//
+//    @Autowired
+//    private ReviewRepository reviewRepository;
 
     @RequestMapping("/podcasts")
     public List<MongoPodcastModel> getAllPodcasts(){
@@ -138,7 +139,7 @@ public class PodcastController {
 
     @Secured("ROLE_AUTHOR")
     @GetMapping("/get-favorite-podcasts")
-    public ResponseEntity getFavoritrPodcasts(){
+    public ResponseEntity getFavoritePodcasts(){
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         MongoUserModel user = userRepository.findByEmail(login);
         List<ObjectId> podcastIds = user.getFavoritePodcasts();
@@ -151,6 +152,40 @@ public class PodcastController {
             }
         }
         return ResponseEntity.ok(result);
+    }
+
+    @Secured("ROLE_USER")
+    @PostMapping("/add-review/{podcastId}")
+    public ResponseEntity addReview(@PathVariable("podcastId") String podcastId, @RequestBody ReviewModel review){
+        if(review.getRate() < 0 || review.getRate() > 5){
+            return ResponseEntity.unprocessableEntity().build();
+        }
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        MongoUserModel user = userRepository.findByEmail(login);
+
+        // find podcast in db
+        MongoPodcastModel podcast = podcastRepository.findById(new ObjectId(podcastId));
+        Optional<MongoPodcastModel> podcastCheck = Optional.ofNullable(podcast);
+        if(podcastCheck.isEmpty()){
+            return ResponseEntity.status(404).body("Podcast not found");
+        }
+
+        review.setUserId(user.getId());
+        podcast.addReview(review);
+        podcastRepository.save(podcast);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/getReviews/{podcastId}")
+    public ResponseEntity getReviews(@PathVariable("podcastId") String podcastId){
+        // find podcast in db
+        MongoPodcastModel podcast = podcastRepository.findById(new ObjectId(podcastId));
+        Optional<MongoPodcastModel> podcastCheck = Optional.ofNullable(podcast);
+        if(podcastCheck.isEmpty()){
+            return ResponseEntity.status(404).body("Podcast not found");
+        }
+
+        return ResponseEntity.ok(podcast.getReviews());
     }
 
 

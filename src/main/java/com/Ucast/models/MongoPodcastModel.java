@@ -1,5 +1,6 @@
 package com.Ucast.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,11 +18,13 @@ public class MongoPodcastModel {
     private ObjectId authorId;
     private String authorName;
     private String filepath;
+    @JsonIgnore
     private boolean isChecked;
     private String description;
     private String photoURL;
     private int listened;
-    private int rating;
+    private double rating;
+//    @JsonIgnore
     private List reviews;
 
     public MongoPodcastModel(){}
@@ -129,11 +132,26 @@ public class MongoPodcastModel {
         this.listened = listened;
     }
 
-    public void setRating(int rating) {
+    public void setRating(double rating) {
         this.rating = rating;
+    }
+
+    public double getRating() {
+        return rating;
     }
 
     public void addListened(){
         this.listened += 1;
+    }
+
+    public List getReviews() {
+        return reviews;
+    }
+
+    public void addReview(ReviewModel review){
+        this.reviews.add(review);
+        int n = this.reviews.size();
+        double diff = ((double)review.getRate() - this.rating)/n;
+        this.rating += diff;
     }
 }
