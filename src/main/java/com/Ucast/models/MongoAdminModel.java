@@ -11,4 +11,10 @@ public class MongoAdminModel {
     @Id
     private String id;
     private ObjectId userId;
+
+    public MongoAdminModel(){}
+
+    public MongoAdminModel(MongoUserModel that){
+        this.userId = that.getObjectId();
+    }
 }

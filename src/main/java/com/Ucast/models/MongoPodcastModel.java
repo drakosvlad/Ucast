@@ -5,6 +5,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class MongoPodcastModel {
     private String authorName;
     private String filepath;
     @JsonIgnore
-    private boolean isChecked;
+    private boolean checked;
     private String description;
     private String photoURL;
     private int listened;
@@ -65,7 +66,7 @@ public class MongoPodcastModel {
                 ", authorId=" + authorId +
                 ", authorName='" + authorName + '\'' +
                 ", filepath='" + filepath + '\'' +
-                ", isChecked=" + isChecked +
+                ", isChecked=" + checked +
                 ", description='" + description + '\'' +
                 '}';
     }
@@ -87,7 +88,7 @@ public class MongoPodcastModel {
     }
 
     public boolean isChecked() {
-        return isChecked;
+        return checked;
     }
 
     public String getFilepath() {
@@ -101,7 +102,7 @@ public class MongoPodcastModel {
     }
 
     public void setChecked(boolean checked) {
-        isChecked = checked;
+        this.checked = checked;
     }
 
     public void setAuthorId(ObjectId authorId) {
@@ -136,6 +137,10 @@ public class MongoPodcastModel {
         this.rating = rating;
     }
 
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
+    }
+
     public double getRating() {
         return rating;
     }
@@ -148,10 +153,15 @@ public class MongoPodcastModel {
         return reviews;
     }
 
+    public void initReviews(){
+        this.reviews = new ArrayList();
+    }
+
     public void addReview(ReviewModel review){
         this.reviews.add(review);
         int n = this.reviews.size();
         double diff = ((double)review.getRate() - this.rating)/n;
-        this.rating += diff;
+        DecimalFormat df = new DecimalFormat("#.#");
+        this.rating = Double.valueOf(df.format(this.rating+diff));
     }
 }

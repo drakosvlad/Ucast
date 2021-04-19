@@ -2,6 +2,7 @@ package com.Ucast.controllers;
 
 import com.Ucast.auth.JwtTokenProvider;
 import com.Ucast.models.*;
+import com.Ucast.repositories.AdminRepository;
 import com.Ucast.repositories.AuthorRepository;
 import com.Ucast.repositories.PodcastRepository;
 import com.Ucast.repositories.UserRepository;
@@ -30,6 +31,8 @@ public class UserController {
     @Autowired
     private AuthorRepository authorRepository;
     @Autowired
+    private AdminRepository adminRepository;
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -42,7 +45,7 @@ public class UserController {
             MongoUserModel existingModel = userRepository.findByEmail(registrationModel.getEmail());
             Optional<MongoUserModel> check = Optional.ofNullable(existingModel);
             if (check.isPresent()) {
-                return ResponseEntity.status(403).build();
+                return ResponseEntity.status(403).body("User already exists");
             }
 
             String encryptedPassword = passwordEncoder.encode(registrationModel.getPassword());
@@ -72,8 +75,13 @@ public class UserController {
 //                String encryptedPassword = passwordEncoder.encode(loginModel.getPassword());
                 MongoAuthorModel authorModel = authorRepository.findByUserId(mongoModel.getObjectId());
                 Optional<MongoAuthorModel> checkAuthor = Optional.ofNullable(authorModel);
+                MongoAdminModel adminModel = adminRepository.findByUserId(mongoModel.getObjectId());
+                Optional<MongoAdminModel> checkAdmin = Optional.ofNullable(adminModel);
                 if(checkAuthor.isPresent()){
                     userRoles.add("ROLE_AUTHOR");
+                }
+                if(checkAdmin.isPresent()){
+                    userRoles.add("ROLE_ADMIN");
                 }
                 if (passwordEncoder.matches(loginModel.getPassword(), mongoModel.getPassword())) {
                     var authToken = jwtTokenProvider.generateToken(mongoModel.getId());
@@ -93,7 +101,7 @@ public class UserController {
     }
 
     @Secured("ROLE_USER")
-    @PostMapping("edit-user")
+    @PostMapping("/user/edit")
     public ResponseEntity editUser(@Validated @RequestBody UserRegistrationModel editModel){
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         MongoUserModel userModel = userRepository.findByEmail(login);
@@ -103,14 +111,15 @@ public class UserController {
         }
         userModel.setAvatarUrl(editModel.getAvatarUrl());
         userModel.setUsername(editModel.getUsername());
+        userModel.setPassword(passwordEncoder.encode(editModel.getPassword()));
         userRepository.save(userModel);
         return ResponseEntity.ok().build();
     }
 
 
     @Secured("ROLE_USER")
-    @PostMapping("add-favorite-podcast")
-    public ResponseEntity addFavoritePodcast(String podcastId){
+    @PostMapping("/favorite-podcast/add/{id}")
+    public ResponseEntity addFavoritePodcast(@PathVariable("id") String podcastId){
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         MongoUserModel user = userRepository.findByEmail(login);
         Optional<MongoUserModel> check = Optional.ofNullable(user);
@@ -128,8 +137,8 @@ public class UserController {
     }
 
     @Secured("ROLE_USER")
-    @PostMapping("remove-favorite-podcast")
-    public ResponseEntity removeFavoritePodcast(String podcastId){
+    @PostMapping("/favorite-podcast/remove/{id}")
+    public ResponseEntity removeFavoritePodcast(@PathVariable("id") String podcastId){
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         MongoUserModel user = userRepository.findByEmail(login);
         // TODO check if this validation is necessary

@@ -15,6 +15,8 @@ public class ReviewModel {
         this.rate = rate;
     }
 
+    public ReviewModel() {}
+
     public int getRate() {
         return rate;
     }

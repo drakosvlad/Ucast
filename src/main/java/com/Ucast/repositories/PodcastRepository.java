@@ -11,8 +11,8 @@ public interface PodcastRepository extends MongoRepository<MongoPodcastModel, St
     public MongoPodcastModel findById(ObjectId id);
     public MongoPodcastModel findByAuthorNameAndName(String authorName, String name);
     public MongoPodcastModel findByAuthorIdAndName(ObjectId id, String name);
-    public List<MongoPodcastModel> findAllByChannelName(String authorName);
-    public List<MongoPodcastModel> findAllByChannelNameAndCheckedTrue(String authorName);   // ??
+    public List<MongoPodcastModel> findByAuthorName(String authorName);
+    public List<MongoPodcastModel> findByAuthorNameAndCheckedTrue(String authorName);   // ??
 
     public List<MongoPodcastModel> findAllByAuthorId(ObjectId authorId);
     public List<MongoPodcastModel> findAllByName(String name);

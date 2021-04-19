@@ -33,7 +33,7 @@ public class PodcastController {
 //    @Autowired
 //    private ReviewRepository reviewRepository;
 
-    @GetMapping("/podcasts")
+    @GetMapping("/podcasts/all")
     public ResponseEntity getAllPodcasts() {
         if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().
                 contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
@@ -42,7 +42,7 @@ public class PodcastController {
         return ResponseEntity.ok(podcastRepository.findAllByCheckedTrue());
     }
 
-    @GetMapping("/filtered-podcasts")
+    @GetMapping("/podcasts/filtered")
     public ResponseEntity getFilteredPodcasts(@RequestBody SearchParameters searchParameters) {
         boolean isAdmin = false;
         if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().
@@ -61,6 +61,10 @@ public class PodcastController {
 
            if(!podcastName.equals("")){
                MongoPodcastModel result = podcastRepository.findByAuthorNameAndName(authorName, podcastName);
+               Optional<MongoPodcastModel> check2 = Optional.ofNullable(result);
+               if(check2.isEmpty()){
+                   return ResponseEntity.ok(new ArrayList<>());
+               }
                if(result.isChecked() || isAdmin) {
                    return ResponseEntity.ok(result);
                } else {
@@ -69,9 +73,9 @@ public class PodcastController {
 
            }else{
                if (isAdmin)
-                   return ResponseEntity.ok(podcastRepository.findAllByChannelName(channelName));
+                   return ResponseEntity.ok(podcastRepository.findByAuthorName(authorName));
                else
-                   return ResponseEntity.ok(podcastRepository.findAllByChannelNameAndCheckedTrue(channelName));
+                   return ResponseEntity.ok(podcastRepository.findByAuthorNameAndCheckedTrue(authorName));
            }
 
         }else{
@@ -101,7 +105,7 @@ public class PodcastController {
     }
 
     @Secured("ROLE_AUTHOR")
-    @PostMapping("/add-podcast")
+    @PostMapping("/podcast/add")
     public ResponseEntity createPodcast(@Validated @RequestBody PodcastModel model){
         MongoPodcastModel existingModel = podcastRepository.findByAuthorNameAndName(model.getAuthorName(), model.getName());
         Optional<MongoPodcastModel> check = Optional.ofNullable(existingModel);
@@ -117,8 +121,10 @@ public class PodcastController {
         MongoPodcastModel newPodcast = new MongoPodcastModel(model);
         newPodcast.setChecked(false);
         newPodcast.setAuthorId(authorId);
+        newPodcast.setAuthorName(author.getName());
         newPodcast.setListened(0);
         newPodcast.setRating(0);
+        newPodcast.initReviews();
         podcastRepository.save(newPodcast);
 
         // add podcast to author's list
@@ -130,7 +136,7 @@ public class PodcastController {
     }
 
     @Secured("ROLE_AUTHOR")
-    @PostMapping("/edit-podcast")
+    @PostMapping("/podcast/edit")
     public ResponseEntity editPodcast(@Validated @RequestBody PodcastModel model){
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
         MongoUserModel user = userRepository.findByEmail(login);
@@ -167,7 +173,7 @@ public class PodcastController {
     }
 
 
-    @Secured("ROLE_USER")
+//    @Secured("ROLE_USER")
     @PostMapping("/increment-listened/{id}")
     public ResponseEntity incrementListenedCounter(@PathVariable("id") String id){
         // in case input value should be
@@ -188,7 +194,7 @@ public class PodcastController {
         return ResponseEntity.ok().build();
     }
 
-    @Secured("ROLE_AUTHOR")
+    @Secured("ROLE_USER")
     @GetMapping("/get-favorite-podcasts")
     public ResponseEntity getFavoritePodcasts(){
         String login = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -227,7 +233,7 @@ public class PodcastController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/getReviews/{podcastId}")
+    @GetMapping("/getReviews/{podcastId}")
     public ResponseEntity getReviews(@PathVariable("podcastId") String podcastId){
         // find podcast in db
         MongoPodcastModel podcast = podcastRepository.findById(new ObjectId(podcastId));

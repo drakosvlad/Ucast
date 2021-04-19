@@ -44,9 +44,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                                 "/author-registration",
                                 "/authors",
                                 "/author/**",
-                                "/podcasts",
+                                "/podcasts/**",
                                 "/podcast/**",
-                                "/static/**"
+                                "/static/**",
+                                "/register-admin",
+                                "/disapprove-podcast",
+                                "/approve-podcast",
+                                "/show-all-authors",
+                                "/show-all-users",
+                                "/channel/**",
+                                "/increment-listened/**",
+                                "/get-favorite-podcasts",
+                                "/add-review/**",
+                                "/getReviews/**",
+                                "/favorite-podcast/**",
+                                "/user/**"
                         ).permitAll()
                             .anyRequest().authenticated()
                 .and()

@@ -74,6 +74,10 @@ public class MongoUserModel {
         this.favoritePodcasts = favoritePodcasts;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public void addFavoritePoscast(ObjectId podcastId){
         this.favoritePodcasts.add(podcastId);
     }

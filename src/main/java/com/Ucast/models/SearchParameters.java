@@ -10,6 +10,10 @@ public class SearchParameters {
         this.podcastName = podcastName;
     }
 
+    public SearchParameters(){
+    }
+
+
     public String getChannelName() {
         return channelName;
     }
