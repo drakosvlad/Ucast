@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,14 +33,49 @@ public class PodcastController {
 //    @Autowired
 //    private ReviewRepository reviewRepository;
 
-    @RequestMapping("/podcasts")
-    public List<MongoPodcastModel> getAllPodcasts(){
-        return podcastRepository.findAll();
+    @GetMapping("/podcasts")
+    public ResponseEntity getAllPodcasts() {
+        if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().
+                contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+            return ResponseEntity.ok(podcastRepository.findAll());
+        }
+        return ResponseEntity.ok(podcastRepository.findAllByCheckedTrue());
     }
 
-    @RequestMapping("/podcast/{id}")
-    public ResponseEntity<MongoPodcastModel> getPodcastInfo(@PathVariable("id") ObjectId id){
-        MongoPodcastModel mongoModel = podcastRepository.findById(id);
+    @GetMapping("/filtered-podcasts")
+    public ResponseEntity getFilteredPodcasts(@RequestBody SearchParameters searchParameters) {
+//        if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().
+//                contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+//            return podcastRepository.findAll();
+//        }
+//        return podcastRepository.findAllByCheckedTrue();
+        String channelName = searchParameters.getChannelName();
+        String podcastName = searchParameters.getPodcastName();
+        if(!channelName.equals("")){
+            MongoAuthorModel author = authorRepository.findByChannelName(channelName);
+            Optional<MongoAuthorModel> check = Optional.ofNullable(author);
+            if(check.isEmpty()){
+                return ResponseEntity.status(404).body("Channel does not exist in database");
+            }
+            String authorName = author.getName();
+           if(!podcastName.equals("")){
+               return ResponseEntity.ok(podcastRepository.findByAuthorNameAndName(authorName, podcastName));
+           }else{
+               return ResponseEntity.ok(podcastRepository.findAllByChannelName(channelName));
+           }
+        }else{
+            if(!podcastName.equals("")){
+                return ResponseEntity.ok(podcastRepository.findAllByName(podcastName));
+            }else{
+                return ResponseEntity.ok(podcastRepository.findAll());
+            }
+        }
+    }
+
+
+    @GetMapping("/podcast/{id}")
+    public ResponseEntity<MongoPodcastModel> getPodcastInfo(@PathVariable("id") String id){
+        MongoPodcastModel mongoModel = podcastRepository.findById(new ObjectId(id));
         Optional<MongoPodcastModel> check = Optional.ofNullable(mongoModel);
         if(check.isPresent()){
             return ResponseEntity.ok(mongoModel);

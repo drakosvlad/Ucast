@@ -27,8 +27,12 @@ public class CustomUserDetails implements UserDetails {
             case "AUTHOR":
                 c.grantedAuthorities = new ArrayList<>();
                 c.grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-                c.grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                c.grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_AUTHOR"));
                 break;
+            case "ADMIN":
+                c.grantedAuthorities = new ArrayList<>();
+                c.grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                c.grantedAuthorities.add((new SimpleGrantedAuthority("ROLE_ADMIN")));
         }
         return c;
     }

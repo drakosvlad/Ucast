@@ -1,5 +1,6 @@
 package com.Ucast.controllers;
 
+import com.Ucast.models.AuthorModel;
 import com.Ucast.models.MongoUserModel;
 import com.Ucast.repositories.AuthorRepository;
 import com.Ucast.models.MongoAuthorModel;
@@ -47,25 +48,24 @@ public class AuthorController {
         return ResponseEntity.ok(authorModel);
     }
 
-    @RequestMapping("/authors")
-    public ResponseEntity<List<MongoAuthorModel>> getAllAuthors(Authentication authentication) {
-        // ROLE VERIFICATION EXAMPLE
-//        if (!authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER"))) {
-//            return ResponseEntity.status(403).build();
-//        }
-
-        return ResponseEntity.ok().body(authorRepository.findAll());
-//        List<MongoAuthorModel> mongoModels = authorRepository.findAll();
-//        List<AuthorModel> result = new ArrayList<>();
-//        for(MongoAuthorModel mongoModel: mongoModels){
-//            result.add(new AuthorModel((mongoModel)));
-//        }
-//        return result;
+    @GetMapping("/channel/{channelName}")
+    public ResponseEntity getChannelInfo(@PathVariable("channelName") String channelName){
+        MongoAuthorModel author = authorRepository.findByChannelName(channelName);
+        Optional<MongoAuthorModel> check = Optional.ofNullable(author);
+        if(check.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(author);
     }
+
+//    @RequestMapping("/authors")
+//    public ResponseEntity<List<MongoAuthorModel>> getAllAuthors(Authentication authentication) {
+//        return ResponseEntity.ok().body(authorRepository.findAll());
+//    }
 
     @Secured("ROLE_USER")
     @PostMapping("/author-registration")
-    public ResponseEntity register(){
+    public ResponseEntity register(@RequestBody AuthorModel authorModel){
         try{
             String login = SecurityContextHolder.getContext().getAuthentication().getName();
             MongoUserModel userModel = userRepository.findByEmail(login);
@@ -73,12 +73,16 @@ public class AuthorController {
             if(check.isEmpty()){
                 return ResponseEntity.status(404).body("authentication failed, user not found");
             }
+
             MongoAuthorModel existingAuthor = authorRepository.findByUserId(userModel.getObjectId());
             Optional<MongoAuthorModel> checkAuthor = Optional.ofNullable(existingAuthor);
             if(checkAuthor.isPresent()){
                 return ResponseEntity.status(403).body("user is already registered as author");
             }
+
             MongoAuthorModel newAuthor = new MongoAuthorModel(userModel);
+            newAuthor.setChannelName(authorModel.getChannelName());
+            newAuthor.setCoverURL(authorModel.getCoverURL());
             authorRepository.save(newAuthor);
             return ResponseEntity.created(URI.create(String.format("/author/%s", newAuthor.getName()))).build();
         } catch (Exception e){

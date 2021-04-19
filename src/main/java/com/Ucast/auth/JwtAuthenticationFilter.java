@@ -1,7 +1,9 @@
 package com.Ucast.auth;
 
+import com.Ucast.models.MongoAdminModel;
 import com.Ucast.models.MongoAuthorModel;
 import com.Ucast.models.MongoUserModel;
+import com.Ucast.repositories.AdminRepository;
 import com.Ucast.repositories.AuthorRepository;
 import com.Ucast.repositories.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -37,6 +39,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private AuthorRepository authorRepository;
 
+    @Autowired
+    private AdminRepository adminRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
@@ -61,10 +66,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null){
             Optional<MongoUserModel> user = userRepository.findById(userId);
             Optional<MongoAuthorModel> author = Optional.ofNullable(authorRepository.findByUserId(new ObjectId(userId)));
+            Optional<MongoAdminModel> admin = Optional.ofNullable(adminRepository.findByUserId(new ObjectId(userId)));
 
             if (user.isPresent() && jwtTokenProvider.validateToken(authToken, user.get())) {
                 String role = "USER";
                 if(author.isPresent()){
+                    role = "AUTHOR";
+                }
+                if(admin.isPresent()){
                     role = "ADMIN";
                 }
                 var userDetails = CustomUserDetails.fromUserEntityToCustomUserDetails(user.get(), role);

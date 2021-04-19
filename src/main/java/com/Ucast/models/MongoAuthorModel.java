@@ -18,6 +18,7 @@ public class MongoAuthorModel {
     private ObjectId userId;
     private List<ObjectId> podcastIdList;
     private String coverURL;
+    private String channelName;
 
     public MongoAuthorModel() {}
 
@@ -33,10 +34,10 @@ public class MongoAuthorModel {
         this.userId = userId;
     }
 
-    public MongoAuthorModel(AuthorModel that){
-        this.name = that.getName();
-        this.userId = that.getUserId();
-    }
+//    public MongoAuthorModel(AuthorModel that){
+//        this.name = that.getName();
+//        this.userId = that.getUserId();
+//    }
 
     @Override
     public String toString() {
@@ -69,5 +70,21 @@ public class MongoAuthorModel {
 
     public void addPodcast(ObjectId podcastId){
         this.podcastIdList.add(podcastId);
+    }
+
+    public void setCoverURL(String coverURL) {
+        this.coverURL = coverURL;
+    }
+
+    public void setChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
+    public String getCoverURL() {
+        return coverURL;
+    }
+
+    public String getChannelName() {
+        return channelName;
     }
 }
