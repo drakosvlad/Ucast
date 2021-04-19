@@ -44,11 +44,11 @@ public class PodcastController {
 
     @GetMapping("/filtered-podcasts")
     public ResponseEntity getFilteredPodcasts(@RequestBody SearchParameters searchParameters) {
-//        if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().
-//                contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
-//            return podcastRepository.findAll();
-//        }
-//        return podcastRepository.findAllByCheckedTrue();
+        boolean isAdmin = false;
+        if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().
+                contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+            isAdmin = true;
+           }
         String channelName = searchParameters.getChannelName();
         String podcastName = searchParameters.getPodcastName();
         if(!channelName.equals("")){
@@ -58,16 +58,32 @@ public class PodcastController {
                 return ResponseEntity.status(404).body("Channel does not exist in database");
             }
             String authorName = author.getName();
+
            if(!podcastName.equals("")){
-               return ResponseEntity.ok(podcastRepository.findByAuthorNameAndName(authorName, podcastName));
+               MongoPodcastModel result = podcastRepository.findByAuthorNameAndName(authorName, podcastName);
+               if(result.isChecked() || isAdmin) {
+                   return ResponseEntity.ok(result);
+               } else {
+                   return ResponseEntity.status(403).body("Podcast is not available");
+               }
+
            }else{
-               return ResponseEntity.ok(podcastRepository.findAllByChannelName(channelName));
+               if (isAdmin)
+                   return ResponseEntity.ok(podcastRepository.findAllByChannelName(channelName));
+               else
+                   return ResponseEntity.ok(podcastRepository.findAllByChannelNameAndCheckedTrue(channelName));
            }
+
         }else{
             if(!podcastName.equals("")){
-                return ResponseEntity.ok(podcastRepository.findAllByName(podcastName));
+                if (isAdmin)
+                    return ResponseEntity.ok(podcastRepository.findAllByName(podcastName));
+                else
+                    return ResponseEntity.ok(podcastRepository.findAllByNameAndCheckedTrue(podcastName));
             }else{
-                return ResponseEntity.ok(podcastRepository.findAll());
+                if (isAdmin)
+                    return ResponseEntity.ok(podcastRepository.findAll());
+                return ResponseEntity.ok(podcastRepository.findAllByCheckedTrue());
             }
         }
     }
