@@ -161,7 +161,6 @@ public class MongoPodcastModel {
         this.reviews.add(review);
         int n = this.reviews.size();
         double diff = ((double)review.getRate() - this.rating)/n;
-        DecimalFormat df = new DecimalFormat("#.#");
-        this.rating = Double.valueOf(df.format(this.rating+diff));
+        this.rating += diff;
     }
 }
