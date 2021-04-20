@@ -58,7 +58,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                                 "/add-review/**",
                                 "/getReviews/**",
                                 "/favorite-podcast/**",
-                                "/user/**"
+                                "/user/**",
+                                "/user-info"
                         ).permitAll()
                             .anyRequest().authenticated()
                 .and()

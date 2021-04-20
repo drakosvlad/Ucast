@@ -15,6 +15,7 @@ public class MongoUserModel {
     private String username;
     private String email;
     private String avatarUrl;   //??
+    @JsonIgnore
     private String password;
     private List<ObjectId> favoritePodcasts;
 

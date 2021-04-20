@@ -156,6 +156,17 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @RequestMapping("/user-info")
+    public ResponseEntity<MongoUserModel> getUserInfo(){
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        MongoUserModel userModel = userRepository.findByEmail(login);
+        Optional<MongoUserModel> check = Optional.ofNullable(userModel);
+        if(check.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(userModel);
+    }
+
 
 }
 
