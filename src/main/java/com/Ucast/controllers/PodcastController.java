@@ -51,6 +51,7 @@ public class PodcastController {
            }
         String channelName = searchParameters.getChannelName();
         String podcastName = searchParameters.getPodcastName();
+
         if(!channelName.equals("")){
             MongoAuthorModel author = authorRepository.findByChannelName(channelName);
             Optional<MongoAuthorModel> check = Optional.ofNullable(author);

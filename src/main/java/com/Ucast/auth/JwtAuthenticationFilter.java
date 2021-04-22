@@ -71,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (user.isPresent() && jwtTokenProvider.validateToken(authToken, user.get())) {
                 String role = "USER";
 
-                if(author.isPresent()){
+                if(author.isPresent() && author.get().isConfirmed()){
                     role = "AUTHOR";
                 }
                 if(admin.isPresent()){

@@ -9,4 +9,5 @@ public interface AuthorRepository extends MongoRepository<MongoAuthorModel, Stri
     public MongoAuthorModel findById(ObjectId id);
     public MongoAuthorModel findByUserId(ObjectId userId);
     public MongoAuthorModel findByChannelName(String channelName);
+    public MongoAuthorModel findAllByConfirmedTrue();
 }

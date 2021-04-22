@@ -63,6 +63,15 @@ public class AuthorController {
 //        return ResponseEntity.ok().body(authorRepository.findAll());
 //    }
 
+    @GetMapping("/channel/all")
+        public ResponseEntity getAllAuthors(){
+            if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().
+                    contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+                return ResponseEntity.ok(authorRepository.findAll());
+            }
+            return ResponseEntity.ok(authorRepository.findAllByConfirmedTrue());
+        }
+
     @Secured("ROLE_USER")
     @PostMapping("/author-registration")
     public ResponseEntity register(@RequestBody AuthorModel authorModel){

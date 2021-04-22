@@ -19,6 +19,7 @@ public class MongoAuthorModel {
     private List<ObjectId> podcastIdList;
     private String coverURL;
     private String channelName;
+    private boolean confirmed;
 
     public MongoAuthorModel() {}
 
@@ -26,6 +27,7 @@ public class MongoAuthorModel {
         this.name = user.getUsername();
         this.userId = user.getObjectId();
         this.description = "";
+        this.confirmed = false;
         this.podcastIdList = new ArrayList<>();
     }
 
@@ -86,5 +88,13 @@ public class MongoAuthorModel {
 
     public String getChannelName() {
         return channelName;
+    }
+
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = confirmed;
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
     }
 }

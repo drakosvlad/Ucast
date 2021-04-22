@@ -45,7 +45,7 @@ public class AdminController {
     }
 
     @Secured("ROLE_ADMIN")
-    @PostMapping("/approve-podcast/{id}")
+    @PostMapping("/approve/podcast/{id}")
     public ResponseEntity approvePodcast(@PathVariable("id") String podcastId){
         MongoPodcastModel mongoModel = podcastRepository.findById(new ObjectId(podcastId));
         Optional<MongoPodcastModel> check = Optional.ofNullable(mongoModel);
@@ -57,8 +57,9 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+
     @Secured("ROLE_ADMIN")
-    @PostMapping("/disapprove-podcast/{id}")
+    @PostMapping("/disapprove/podcast/{id}")
     public ResponseEntity disapprovePodcast(@PathVariable("id") String podcastId){
         MongoPodcastModel mongoModel = podcastRepository.findById(new ObjectId(podcastId));
         Optional<MongoPodcastModel> check = Optional.ofNullable(mongoModel);
@@ -71,6 +72,34 @@ public class AdminController {
         authorRepository.save(author);
         return ResponseEntity.ok().build();
     }
+
+
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/approve/admin/{id}")
+    public ResponseEntity approveAdmin(@PathVariable("id") String authorId){
+        MongoAuthorModel mongoModel = authorRepository.findById(new ObjectId(authorId));
+        Optional<MongoAuthorModel> check = Optional.ofNullable(mongoModel);
+        if(check.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        mongoModel.setConfirmed(true);
+        authorRepository.save(mongoModel);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/disapprove/admin/{id}")
+    public ResponseEntity disapproveAdmin(@PathVariable("id") String authorId){
+        MongoAuthorModel mongoModel = authorRepository.findById(new ObjectId(authorId));
+        Optional<MongoAuthorModel> check = Optional.ofNullable(mongoModel);
+        if(check.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        authorRepository.deleteById(authorId);
+        return ResponseEntity.ok().build();
+    }
+
 
     @Secured("ROLE_USER")
     @PostMapping("/register-admin")
