@@ -48,6 +48,16 @@ public class AuthorController {
         return ResponseEntity.ok(authorModel);
     }
 
+    @RequestMapping("/author/user_id/{user_id}")
+    public ResponseEntity<MongoAuthorModel> getAuthorInfoByUserId(@PathVariable("user_id") ObjectId user_id){
+        MongoAuthorModel authorModel = authorRepository.findByUserId(user_id);
+        Optional<MongoAuthorModel> check = Optional.ofNullable(authorModel);
+        if(check.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(authorModel);
+    }
+
     @GetMapping("/channel/{channelName}")
     public ResponseEntity getChannelInfo(@PathVariable("channelName") String channelName){
         MongoAuthorModel author = authorRepository.findByChannelName(channelName);
