@@ -100,4 +100,24 @@ public class AuthorController {
         }
 
     }
+
+    @Secured("ROLE_AUTHOR")
+    @PostMapping("/author/edit")
+    public ResponseEntity editAuthor(@Validated @RequestBody AuthorModel editModel){
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        MongoUserModel userModel = userRepository.findByEmail(login);
+        Optional<MongoUserModel> check = Optional.ofNullable(userModel);
+        if(check.isEmpty()){
+            return ResponseEntity.status(404).body("Authentication failed. User not found");
+        }
+        MongoAuthorModel authorModel = authorRepository.findByUserId(new ObjectId(userModel.getId()));
+        Optional<MongoAuthorModel> check2 = Optional.ofNullable(authorModel);
+        if(check2.isEmpty()){
+            return ResponseEntity.status(404).body("Authentication failed. Author not found");
+        }
+        authorModel.setChannelName(editModel.getChannelName());
+        authorModel.setCoverURL(editModel.getCoverURL());
+        authorRepository.save(authorModel);
+        return ResponseEntity.ok().build();
+    }
 }
