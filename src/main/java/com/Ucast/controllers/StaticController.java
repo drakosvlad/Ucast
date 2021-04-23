@@ -43,7 +43,8 @@ public class StaticController {
     @Autowired
     private PodcastRepository podcastRepository;
 
-    @Secured("ROLE_AUTHOR")
+//    @Secured("ROLE_AUTHOR")
+    @Secured("ROLE_USER")
     @PostMapping("/static")
     public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file,
                                    RedirectAttributes redirectAttributes) {
