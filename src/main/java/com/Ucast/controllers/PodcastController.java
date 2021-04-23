@@ -230,6 +230,7 @@ public class PodcastController {
         }
 
         review.setUserId(user.getId());
+        review.setUserName(user.getUsername());
         podcast.addReview(review);
         podcastRepository.save(podcast);
         return ResponseEntity.ok().build();
