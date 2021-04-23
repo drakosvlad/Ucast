@@ -23,6 +23,8 @@ public class MongoPodcastModel {
     private boolean checked;
     private String description;
     private String photoURL;
+//    @JsonIgnore
+//    private boolean authorBlocked;
 
     public int getListened() {
         return listened;
@@ -173,4 +175,12 @@ public class MongoPodcastModel {
         double diff = ((double)review.getRate() - this.rating)/n;
         this.rating += diff;
     }
+//
+//    public void setAuthorBlocked(boolean authorBlocked) {
+//        this.authorBlocked = authorBlocked;
+//    }
+//
+//    public boolean isAuthorBlocked() {
+//        return authorBlocked;
+//    }
 }

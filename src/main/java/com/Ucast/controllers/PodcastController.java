@@ -121,6 +121,7 @@ public class PodcastController {
         // add new model to db
         MongoPodcastModel newPodcast = new MongoPodcastModel(model);
         newPodcast.setChecked(false);
+//        newPodcast.setAuthorBlocked(false);
         newPodcast.setAuthorId(authorId);
         newPodcast.setAuthorName(author.getName());
         newPodcast.setListened(0);

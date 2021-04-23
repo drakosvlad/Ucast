@@ -75,28 +75,53 @@ public class AdminController {
 
 
     @Secured("ROLE_ADMIN")
-    @PostMapping("/approve/admin/{id}")
-    public ResponseEntity approveAdmin(@PathVariable("id") String authorId){
+    @PostMapping("/approve/author/{id}")
+    public ResponseEntity approveAuthor(@PathVariable("id") String authorId){
         MongoAuthorModel mongoModel = authorRepository.findById(new ObjectId(authorId));
         Optional<MongoAuthorModel> check = Optional.ofNullable(mongoModel);
         if(check.isEmpty()){
             return ResponseEntity.notFound().build();
         }
         mongoModel.setConfirmed(true);
+        List<MongoPodcastModel> podcasts = podcastRepository.findAllByAuthorId(new ObjectId(authorId));
+        if(!podcasts.isEmpty()){
+            for(MongoPodcastModel podcast: podcasts){
+                podcast.setChecked(true);
+                podcastRepository.save(podcast);
+            }
+        }
         authorRepository.save(mongoModel);
         return ResponseEntity.ok().build();
     }
 
 
     @Secured("ROLE_ADMIN")
-    @PostMapping("/disapprove/admin/{id}")
-    public ResponseEntity disapproveAdmin(@PathVariable("id") String authorId){
+    @PostMapping("/disapprove/author/{id}")
+    public ResponseEntity disapproveAuthor(@PathVariable("id") String authorId){
         MongoAuthorModel mongoModel = authorRepository.findById(new ObjectId(authorId));
         Optional<MongoAuthorModel> check = Optional.ofNullable(mongoModel);
         if(check.isEmpty()){
             return ResponseEntity.notFound().build();
         }
         authorRepository.deleteById(authorId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/block-author/{id}")
+    public ResponseEntity blockAuthor(@PathVariable("id") String authorId){
+        MongoAuthorModel author = authorRepository.findById(new ObjectId(authorId));
+        Optional<MongoAuthorModel> check = Optional.ofNullable(author);
+        if(check.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        author.setConfirmed(false);
+        authorRepository.save(author);
+        List<MongoPodcastModel> podcasts = podcastRepository.findAllByAuthorId(new ObjectId(authorId));
+        for(MongoPodcastModel podcast: podcasts){
+            podcast.setChecked(false);
+            podcastRepository.save(podcast);
+        }
         return ResponseEntity.ok().build();
     }
 
