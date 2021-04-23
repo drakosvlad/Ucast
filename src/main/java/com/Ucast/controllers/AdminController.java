@@ -125,4 +125,34 @@ public class AdminController {
         }
 //        return ResponseEntity.ok("d,ldl,dcl,sdl,sd");
     }
+
+    @Secured("ROLE_USER")
+    @PostMapping("/block-user/{userId}")
+    public ResponseEntity blockUser(@PathVariable("userId") String userId){
+        Optional<MongoUserModel> userCheck = userRepository.findById(userId);
+        if(userCheck.isEmpty())
+            return ResponseEntity.status(404).body("user not found");
+        MongoUserModel user = userCheck.get();
+        if(user.isBlocked()){
+            return ResponseEntity.status(403).body("user is already blocked");
+        }
+        user.setBlocked(true);
+        userRepository.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @Secured("ROLE_USER")
+    @PostMapping("/unblock-user/{userId}")
+    public ResponseEntity unblockUser(@PathVariable("userId") String userId){
+        Optional<MongoUserModel> userCheck = userRepository.findById(userId);
+        if(userCheck.isEmpty())
+            return ResponseEntity.status(404).body("user not found");
+        MongoUserModel user = userCheck.get();
+        if(!user.isBlocked()){
+            return ResponseEntity.status(403).body("user is already active");
+        }
+        user.setBlocked(false);
+        userRepository.save(user);
+        return ResponseEntity.ok().build();
+    }
 }
