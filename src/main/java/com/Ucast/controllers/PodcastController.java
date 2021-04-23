@@ -42,7 +42,7 @@ public class PodcastController {
         return ResponseEntity.ok(podcastRepository.findAllByCheckedTrue());
     }
 
-    @GetMapping("/podcasts/filtered")
+    @PostMapping("/podcasts/filtered")
     public ResponseEntity getFilteredPodcasts(@RequestBody SearchParameters searchParameters) {
         boolean isAdmin = false;
         if(SecurityContextHolder.getContext().getAuthentication().getAuthorities().
