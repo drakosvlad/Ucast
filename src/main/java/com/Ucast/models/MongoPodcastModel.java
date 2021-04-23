@@ -24,6 +24,11 @@ public class MongoPodcastModel {
     private boolean checked;
     private String description;
     private String photoURL;
+
+    public int getListened() {
+        return listened;
+    }
+
     private int listened;
     private double rating;
 //    @JsonIgnore
@@ -58,6 +63,7 @@ public class MongoPodcastModel {
         description = that.getDescription();
         photoURL = that.getPhotoURL();
         timecodes = that.getTimecodes();
+        listened = that.getListened();
     }
 
     @Override
