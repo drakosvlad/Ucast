@@ -19,6 +19,7 @@ public class MongoPodcastModel {
     private ObjectId authorId;
     private String authorName;
     private String filepath;
+    private String timecodes;
     @JsonIgnore
     private boolean checked;
     private String description;
@@ -56,6 +57,7 @@ public class MongoPodcastModel {
         filepath = that.getFilepath();
         description = that.getDescription();
         photoURL = that.getPhotoURL();
+        timecodes = that.getTimecodes();
     }
 
     @Override
@@ -68,6 +70,7 @@ public class MongoPodcastModel {
                 ", filepath='" + filepath + '\'' +
                 ", isChecked=" + checked +
                 ", description='" + description + '\'' +
+                ", timecodes='" + timecodes + '\'' +
                 '}';
     }
 
@@ -86,6 +89,8 @@ public class MongoPodcastModel {
     public String getAuthorName() {
         return authorName;
     }
+
+    public String getTimecodes() { return timecodes; }
 
     public boolean isChecked() {
         return checked;
