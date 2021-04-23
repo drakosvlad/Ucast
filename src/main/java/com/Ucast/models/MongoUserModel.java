@@ -18,6 +18,7 @@ public class MongoUserModel {
     @JsonIgnore
     private String password;
     private List<ObjectId> favoritePodcasts;
+    private boolean blocked;
 
 
     public MongoUserModel(){}
@@ -89,5 +90,13 @@ public class MongoUserModel {
 
     public List<ObjectId> getFavoritePodcasts() {
         return favoritePodcasts;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+    }
+
+    public boolean isBlocked() {
+        return blocked;
     }
 }

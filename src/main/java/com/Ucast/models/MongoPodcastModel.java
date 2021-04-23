@@ -20,7 +20,6 @@ public class MongoPodcastModel {
     private String authorName;
     private String filepath;
     private String timecodes;
-    @JsonIgnore
     private boolean checked;
     private String description;
     private String photoURL;

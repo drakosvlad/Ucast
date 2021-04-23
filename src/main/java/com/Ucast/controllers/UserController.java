@@ -53,6 +53,7 @@ public class UserController {
                     registrationModel.getEmail(), encryptedPassword, registrationModel.getAvatarUrl());
 
             newUser.setFavoritePodcasts(new ArrayList<>());
+            newUser.setBlocked(false);
             userRepository.save(newUser);
             return ResponseEntity.created(URI.create(String.format("/user/%s", newUser.getUsername()))).build();
 
@@ -69,31 +70,33 @@ public class UserController {
             Optional<MongoUserModel> check = Optional.ofNullable(mongoModel);
             if (check.isEmpty()) {
                 return ResponseEntity.notFound().build();
-            } else {
-                List<String> userRoles = new ArrayList<>();
-                userRoles.add("ROLE_USER");
-//                String encryptedPassword = passwordEncoder.encode(loginModel.getPassword());
-                MongoAuthorModel authorModel = authorRepository.findByUserId(mongoModel.getObjectId());
-                Optional<MongoAuthorModel> checkAuthor = Optional.ofNullable(authorModel);
-                MongoAdminModel adminModel = adminRepository.findByUserId(mongoModel.getObjectId());
-                Optional<MongoAdminModel> checkAdmin = Optional.ofNullable(adminModel);
-                if(checkAuthor.isPresent()){
-                    userRoles.add("ROLE_AUTHOR");
-                }
-                if(checkAdmin.isPresent()){
-                    userRoles.add("ROLE_ADMIN");
-                }
-                if (passwordEncoder.matches(loginModel.getPassword(), mongoModel.getPassword())) {
-                    var authToken = jwtTokenProvider.generateToken(mongoModel.getId());
-                    return ResponseEntity.ok(new Object() {
-                                public final String token = authToken;
-                                public final List<String> roles = userRoles;
-                                public final String id = mongoModel.getId();
-                            }
-                    );
-                }
+            }
+            if(mongoModel.isBlocked()) {
                 return ResponseEntity.status(401).build();
             }
+            List<String> userRoles = new ArrayList<>();
+            userRoles.add("ROLE_USER");
+//                String encryptedPassword = passwordEncoder.encode(loginModel.getPassword());
+            MongoAuthorModel authorModel = authorRepository.findByUserId(mongoModel.getObjectId());
+            Optional<MongoAuthorModel> checkAuthor = Optional.ofNullable(authorModel);
+            MongoAdminModel adminModel = adminRepository.findByUserId(mongoModel.getObjectId());
+            Optional<MongoAdminModel> checkAdmin = Optional.ofNullable(adminModel);
+            if(checkAuthor.isPresent()){
+                userRoles.add("ROLE_AUTHOR");
+            }
+            if(checkAdmin.isPresent()){
+                userRoles.add("ROLE_ADMIN");
+            }
+            if (passwordEncoder.matches(loginModel.getPassword(), mongoModel.getPassword())) {
+                var authToken = jwtTokenProvider.generateToken(mongoModel.getId());
+                return ResponseEntity.ok(new Object() {
+                                             public final String token = authToken;
+                                             public final List<String> roles = userRoles;
+                                             public final String id = mongoModel.getId();
+                                         }
+                );
+            }
+            return ResponseEntity.status(401).build();
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.unprocessableEntity().build();
@@ -111,7 +114,7 @@ public class UserController {
         }
         userModel.setAvatarUrl(editModel.getAvatarUrl());
         userModel.setUsername(editModel.getUsername());
-        userModel.setPassword(passwordEncoder.encode(editModel.getPassword()));
+//        userModel.setPassword(passwordEncoder.encode(editModel.getPassword()));
         userRepository.save(userModel);
         return ResponseEntity.ok().build();
     }
